@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "automol-resources"
+version = "1.0.1"
+description = "AutoMol Resources: Trained models and data files for AutoMol"
+# readme will be set at package level
+license = {text = "All rights reserved, Open Analytics NV, 2021-2025"}
+authors = [
+    {name = "Joris Tavernier", email = "joris.tavernier@openanalytics.eu"},
+    {name = "Marvin Steijaert", email = "marvin.steijaert@openanalytics.eu"}
+]
+maintainers = [
+    {name = "Joris Tavernier", email = "joris.tavernier@openanalytics.eu"},
+    {name = "Marvin Steijaert", email = "marvin.steijaert@openanalytics.eu"}
+]
+keywords = [
+    "drug-discovery",
+    "machine-learning", 
+    "molecular-models",
+    "trained-models",
+    "cheminformatics"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research", 
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10", 
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+requires-python = ">=3.8"
+dependencies = [
+    # Minimal dependencies for loading trained models
+    "importlib-resources>=6.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/openanalytics/MolAgent"
+Repository = "https://github.com/openanalytics/MolAgent"
+Documentation = "https://github.com/openanalytics/MolAgent/tree/main/AutoMol"
+
+# Package discovery
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["automol*"]
+exclude = ["tests*", "docs*", "build*"]
+
+[tool.setuptools.package-data]
+"automol.trained_models" = ["*.pt", "*.ckpt"]
+
+# Development tools configuration
+[tool.black]
+line-length = 100
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+known_first_party = ["automol"]

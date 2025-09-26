@@ -1,0 +1,27 @@
+automol @ file://automol
+automol-resources @ file://automol_resources
+babel==2.17.0
+bokeh==3.7.3
+fastjsonschema==2.21.1
+hyperopt==0.2.7
+jinja2==3.1.6
+jupyter==1.1.1
+jupyterlab==4.4.4
+lightgbm==4.6.0
+lightning==2.5.2
+lightning-utilities==0.14.3
+mdanalysis==2.9.0
+molfeat==0.11.0
+numpy==1.26.4
+prolif==2.0.3
+pytorch-lightning==2.5.2
+rdkit==2024.3.5
+scikit-learn==1.7.0
+scipy==1.16.0
+streamlit==1.46.1
+torch==2.7.1
+torch-geometric==2.6.1
+torchmetrics==1.7.3
+torchvision==0.22.1
+uvicorn==0.35.0
+xgboost==3.0.2

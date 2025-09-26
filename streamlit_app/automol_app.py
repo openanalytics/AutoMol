@@ -77,7 +77,7 @@ with c2:
 with c1:
     st.title('AutoM(o)L')
 
-st.markdown('Pipeline for automated machine learning using the bottleneck transformer.  \n * **Authors**: Mazen Ahmad, Joris Tavernier, Natalia Dyubankova, Marvin Steijaert  \n * **Contact**: Contact: joris.tavernier@openanalytics.eu, Marvin.Steijaert@openanalytics.eu  \n &copy; All rights reserved, Open Analytics NV, 2021-2025.' )
+st.markdown('Pipeline for automated machine learning using the bottleneck transformer.  \n * **Developers**: Joris Tavernier and Marvin Steijaert and Gómez-Tamayo, Jose Carlos and Mazen Ahmad  \n * **maintainers**: Contact: joris.tavernier@openanalytics.eu, Marvin.Steijaert@openanalytics.eu  \n &copy; All rights reserved, Open Analytics NV, 2021-2025.' )
 st.caption('Maintainer: Joris Tavernier')
 
 st.markdown('**General Usage Guidelines** \n \n Firstly, we, the developers of AutoMoL, assume that the data provided to the pipeline is clean data. The pipeline **does not handle qualifiers or outliers** in the property target. This is the responsibility of the end-user. This should be done with care and with knowledge of the data at hand. \n \n \n Happy Trails!')

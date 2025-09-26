@@ -205,7 +205,7 @@ def gen_sb_general_tasks(df):
     used_features = st.multiselect(
         "Select features to fit properties",
         [*feature_generators],
-        default=[],
+        default=[[*feature_generators][0]],
         help="Select used features",
     )
     
@@ -641,11 +641,11 @@ def gen_mp_validation(df, train_properties, model_trainer, strategy, categorical
             stacked_model.leave_group_out = leave_group_out
             stacked_model.prop_cliff_dict = prop_cliff_dict
         elif strategy == 'stratified':
-            Train, Validation, sihl_dict = stratified_validation(df, train_properties, stacked_model, df_smiles, test_size=test_size, clustering=val_clustering,
+            Train, Validation, sihl_dict = stratified_validation(df, train_properties, stacked_model, standard_smiles_column, df_smiles, test_size=test_size, clustering=val_clustering,
                                                                  n_clusters=val_km_groups, cutoff=val_butina_cutoff, include_chirality=val_include_chirality,
                                                                  verbose=verbose, random_state=random_state, plot_silhouette=True, cmap=sihl_map, clustering_algorithm=c_algo)
         else:
-            Train, Validation, sihl_dict = leave_grp_out_validation(df, train_properties, stacked_model, df_smiles, test_size=test_size, clustering=val_clustering,
+            Train, Validation, sihl_dict = leave_grp_out_validation(df, train_properties, stacked_model, standard_smiles_column, df_smiles, test_size=test_size, clustering=val_clustering,
                                                                     n_clusters=val_km_groups, cutoff=val_butina_cutoff, include_chirality=val_include_chirality,
                                                                     verbose=verbose, random_state=random_state, plot_silhouette=True, cmap=sihl_map, clustering_algorithm=c_algo)
             leave_group_out = np.arange(len(Validation))

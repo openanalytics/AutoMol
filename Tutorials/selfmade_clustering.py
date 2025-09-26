@@ -107,7 +107,7 @@ class SklearnClusteringForSmiles(ClusteringAlgorithm):
         If feature generation dictionary is not provided, default public generators are used
         
         If used features is not provided or provided features are not available in the generator dictionary,
-                DL is used if present in generation dictionary,
+                Bottleneck is used if present in generation dictionary,
                 otherwise al generators in the dictionary are used. 
         
         Args:
@@ -116,13 +116,13 @@ class SklearnClusteringForSmiles(ClusteringAlgorithm):
         """
         super(SklearnClusteringForSmiles, self).__init__()
         if not feature_generators or feature_generators is None:
-            self._feature_generators= retrieve_default_offline_generators(model='ChEMBL', radius=2, nbits=2048, chylearn=0)
+            self._feature_generators= retrieve_default_offline_generators(model='ChEMBL', radius=2, nbits=2048)
         else:
             assert isinstance(feature_generators,dict), 'provided feature generators must be dictionary'
             self._feature_generators=feature_generators
             
         if used_features is None or len(used_features)<1:
-            used_features=['DL']
+            used_features=['Bottleneck']
         self._used_features=[]
         for feat in used_features:
             if feat in self._feature_generators:
@@ -132,8 +132,8 @@ class SklearnClusteringForSmiles(ClusteringAlgorithm):
                 self._feature_generators[feat]=ECFPGenerator(radius=splits[2], nBits =splits[1])
                 self._used_features.append(feat)
         if len(self._used_features)<1:
-            if 'DL' in self._feature_generators:
-                self._used_features.append('DL')
+            if 'Bottleneck' in self._feature_generators:
+                self._used_features.append('Bottleneck')
             else:
                 for key,item in self._feature_generators.items():
                     self._used_features.append(key)
