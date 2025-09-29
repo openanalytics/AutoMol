@@ -4,7 +4,7 @@
 
 Pipeline for automated machine learning for drug design.
 
-* **Authors**: Mazen Ahmad, Joris Tavernier, Natalia Dyubankova, Marvin Steijaert
+* **Authors**: Joris Tavernier, Marvin Steijaert
 * **Contact**: joris.tavernier@openanalytics.eu, Marvin.Steijaert@openanalytics.eu
 
 &copy; All rights reserved, Open Analytics NV, 2021-2025.
