@@ -7,23 +7,47 @@ Contact: joris.tavernier@openanalytics.eu, Marvin.Steijaert@openanalytics.eu
 All rights reserved, Open Analytics NV, 2021-2025. 
 """
 
-import torch
+# import torch  # Removed: PyTorch dependency no longer needed
 import sys,  pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np, math
-from torch import nn
+# from torch import nn  # Removed: PyTorch dependency no longer needed
 
 from automol.stacking_methodarchive import ClassifierArchive, ReducedimArchive, RegressorArchive 
 from .stat_util import plot_reg_model
 from .model_search import NestedCVModelSearch, NestedCVSingleModelSearch, NestedCVBaseStackingSearch, NestedCVSingleStackSearch, ClassificationFinder, RegressionFinder
 from .grid_parameters import make_grid_parm, make_hyperopt_grid_parm, make_stacking_grid_parm, make_hyperopt_stacking_grid_parm
-from .feature_generators import BottleneckTransformer, ECFPGenerator, retrieve_default_offline_generators
+from .feature_generators import OnnxBottleneckTransformer as _OnnxBottleneckTransformer, ECFPGenerator, retrieve_default_offline_generators
 from .clustering import ClusteringAlgorithm, MurckoScaffoldClustering, ButinaSplitReassigned, HierarchicalButina, KmeansForSmiles
 from .data_formation import SingleLigand, PairedLigands, get_nb_feature_multiplier
 
 
 from .version import __version__ as AutoMLv
 from packaging import version
+
+# Backward compatibility wrapper for BottleneckTransformer
+class BottleneckTransformer(_OnnxBottleneckTransformer):
+    """
+    Backward compatibility wrapper for OnnxBottleneckTransformer.
+
+    This class accepts the old 'model' parameter (e.g., model='CHEMBL') for backward
+    compatibility with existing code, but ignores it since the ONNX model is fixed.
+    """
+    def __init__(self, model=None, model_path=None, vocab_path=None, providers=None,
+                 batch_size=100, seq_len=220, use_gpu=False):
+        """
+        Initialize with backward-compatible parameters.
+
+        Args:
+            model: Ignored (kept for backward compatibility). Was used to specify
+                   the transformer model type (e.g., 'CHEMBL', 'ENUM_SMILES_STEREO').
+            use_gpu: Ignored (kept for backward compatibility). ONNX Runtime handles
+                     device selection automatically.
+            All other parameters passed to OnnxBottleneckTransformer.
+        """
+        # Ignore 'model' and 'use_gpu' parameters for backward compatibility
+        super().__init__(model_path=model_path, vocab_path=vocab_path,
+                        providers=providers, batch_size=batch_size, seq_len=seq_len)
 
 from sklearn.ensemble import StackingRegressor,StackingClassifier
 from sklearn.metrics import mean_squared_error, r2_score
@@ -45,6 +69,7 @@ import json
 
 from datetime import datetime
 from typing import Callable
+import joblib
 
 
 
@@ -330,21 +355,21 @@ def compute_tanimoto_distances(smi_i,smiles_data,radius=2,nbits=1024):
 
 
 #################################################################
-class BottleneckFeatureGenerator(nn.Module):
-    """    
+class BottleneckFeatureGenerator:  # Removed nn.Module inheritance - no longer needed with ONNX Runtime
+    """
     Default features are the Bottleneck features generated from the bottleneckTransformer
     """
     def __init__(self,model='CHEMBL',use_gpu=False,batch_size=100,seq_len=220,multiprop_prefix='automol_multiprop', multiprop_split='@%@'):
-        """    
+        """
         Initialization of the base feature generator
-        
+
         Args:
              model: which encoder to be used in the bottleneck transformer
-             use_gpu: boolean
+             use_gpu: boolean (deprecated - kept for backward compatibility)
              batch_size: batch size
              seq_len: max sequence length of the smiles
         """
-        super(BottleneckFeatureGenerator, self).__init__()
+        # super(BottleneckFeatureGenerator, self).__init__()  # Removed: no longer inheriting from nn.Module
         self.model=model
         self.use_gpu=use_gpu
         self.batch_size=batch_size
@@ -2778,70 +2803,67 @@ class FeatureGenerationTopStackingRegressorClassifier(FeatureGenerationRegressio
 def load_model(model_file=None,use_gpu=True,rtol=1e-6, atol=1e-8,relative_error=True,retrieve_reproducability_errors=False
               , result_dict:dict=None
               , metadata:dict=None) :
-    """    
+    """
     loads a stacking model and evaluate the reproducable output
-    
+
     Args:
-         model_file: .pt file with the model
-         use_gpu: use_gpu
+         model_file: .pkl file with the model (changed from .pt to .pkl for joblib)
+         use_gpu: kept for backward compatibility but no longer used (ONNX Runtime doesn't need GPU setup)
          rtol: relative tolerance for errors
          atol: absolute tolerance for errors
          relative_error: compute relative error of reproducable errors
          retrieve_reproducability_errors: return dictionary of with errors
-    
-    Returns: 
+
+    Returns:
         model or tuple of model and dictionary of errors
     """
     print(f"Loading model from file {model_file}...")
 
-    aa=torch.load(model_file , map_location='cpu',weights_only=False)
+    aa=joblib.load(model_file)
     model=aa['model']
-    if result_dict is not None:
+    if result_dict is not None and 'res_dict' in aa:
         for key, value in aa['res_dict'].items():
-            result_dict[key]=value 
-    if metadata is not None:
-        metadata['model_metadata']=aa['metadata'] 
-    model.load_state_dict(aa['model_state_dict'])
+            result_dict[key]=value
+    if metadata is not None and 'metadata' in aa:
+        metadata['model_metadata']=aa['metadata']
+    # sklearn models don't have state_dict() - they can be loaded directly
 
-    device =torch.device('cpu')
-    if use_gpu and  torch.cuda.is_available(): 
-        device = torch.device(f'cuda:0')
-    print('using device:',device)
-    model=model.to(device)
+    # GPU device management removed - ONNX Runtime handles device selection internally
+    print('Model loaded successfully (device handled by ONNX Runtime)')
 
     reproducability_errors={}
     try:
-        reproducability_errors=model.test_reproducable_output(rtol=rtol, atol=atol,verbose=True,relative_error=relative_error) 
+        reproducability_errors=model.test_reproducable_output(rtol=rtol, atol=atol,verbose=True,relative_error=relative_error)
     except AttributeError:
         pass
 
     if retrieve_reproducability_errors:
         return model,reproducability_errors
-    return model    
+    return model
 
 
     
 
 def save_model(model, f_path,create_reproducability_output=True, result_dict:dict=None):
-    """    
+    """
     save the model and generates the reproducable output
-    
+
     Args:
          model: the stacking model
-         f_path: the .pt file where the model should be saved
+         f_path: the .pkl file where the model should be saved (changed from .pt to .pkl for joblib)
          create_reproducability_output: generate reproducability error
     """
     #check if reproducability generation functionality is available within the model
     if hasattr(model,'reproducable_output'):
         if create_reproducability_output:
-            model.generate_reproducable_output()     
-    print(f"Saving config file to file {f_path}...")
+            model.generate_reproducable_output()
+    print(f"Saving model to file {f_path}...")
     out={}
     if hasattr(model, 'clean_features'):model.clean_features()
     out['model']= model
-    out['model_state_dict']= model.state_dict()
-    if result_dict is not None: 
+    # sklearn models don't have state_dict() - they can be saved directly
+    if result_dict is not None:
         out['res_dict']=result_dict
-    torch.save( out,f_path)
+    joblib.dump(out, f_path)
         
 

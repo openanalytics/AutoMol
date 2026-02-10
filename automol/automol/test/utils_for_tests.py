@@ -11,32 +11,13 @@ from sklearn.utils.multiclass import unique_labels
 from automol.stacking_util import get_clustering_algorithm
 
 
-"""! @brief  implementation of the multi-layer perceptron wrappers.
-
-@section author_section Author(s)
-
+"""
 Authors: Mazen Ahmad, Joris Tavernier, Natalia Dyubankova, Marvin Steijaert
 
-Contact: mahmad13@its.jnj.com, jtaverni@its.jnj.com
+Contact: joris.tavernier@openanalytics.eu
 
-All rights reserved, Janssen Pharmaceutica and Open Analytics NV, 2021-2022. 
+All rights reserved, Open Analytics NV, 2021-2025. 
 """
-##
-# @file mlpwrappers.py
-#
-# @brief  implementation of the multi-layer perceptron wrappers.
-#
-# @section libraries_sensors Libraries/Modules
-# - sklearn.utils.validation
-# - sklearn.base 
-# - sklearn.neural_network
-# - sklearn.utils.multiclass
-#
-# @section author_sensors Author(s)
-#
-#Authors: Mazen Ahmad, Joris Tavernier, Natalia Dyubankova, Marvin Steijaert
-#
-#All rights reserved, Janssen Pharmaceutica and Open Analytics NV, 2021-2022. 
 
 class HammingMultioutputScore():   
     def __call__(self,y_true,y_pred):
@@ -187,11 +168,11 @@ class test_util:
                                                           verbose=verbose,random_state=random_state,mix_dict=mix_coef_dict, categorical_data=categorical,
                                                            minority_nb=minority_nb,clustering_algorithm=clustering_algorithm, chem_clustering_algorithm=chem_clustering_algorithm)
         elif strategy=='stratified':
-            Train, Validation = stratified_validation(df,class_properties,stacked_model,df_smiles,test_size=test_size,clustering=val_clustering,
+            Train, Validation = stratified_validation(df,class_properties,stacked_model,standard_smiles_column,df_smiles,test_size=test_size,clustering=val_clustering,
                                                           n_clusters=val_km_groups,cutoff=val_butina_cutoff,include_chirality=val_include_chirality,
                                                           verbose=verbose,random_state=random_state, minority_nb=minority_nb,clustering_algorithm=clustering_algorithm)
         else:
-            Train, Validation = leave_grp_out_validation(df,class_properties,stacked_model,df_smiles,test_size=test_size,clustering=val_clustering,
+            Train, Validation = leave_grp_out_validation(df,class_properties,stacked_model,standard_smiles_column,df_smiles,test_size=test_size,clustering=val_clustering,
                                                           n_clusters=val_km_groups,cutoff=val_butina_cutoff,include_chirality=val_include_chirality,
                                                           verbose=verbose,random_state=random_state,clustering_algorithm=clustering_algorithm)
             leave_grp_out=np.arange(len(Validation))

@@ -6,7 +6,6 @@ from unittest import TestCase
 import numpy as np
 import pandas as pd
 from  matplotlib import pyplot as plt
-from pkg_resources import resource_filename
 
 from automol.property_prep import add_stereo_smiles,validate_rdkit_smiles, make_category
 from automol.stacking_util import ResultDesigner        
@@ -22,7 +21,7 @@ from automol.clustering import ClusteringAlgorithm, MurckoScaffoldClustering, Bu
 from automol.test.utils_for_tests import *
 
 verbose=0
-data = resource_filename('automol.test', 'ChEMBL_SMILES.csv')
+data = base_dir = os.path.dirname(os.path.realpath(__file__)) + '/ChEMBL_SMILES.csv'
 smiles_col='smiles'
 dv_properties=['prop1','prop2','prop3','prop4']
 cat_properties=['prop5']

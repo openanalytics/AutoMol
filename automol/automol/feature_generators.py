@@ -4,22 +4,21 @@ Authors: Joris Tavernier and Marvin Steijaert
 
 Contact: joris.tavernier@openanalytics.eu, Marvin.Steijaert@openanalytics.eu
 
-All rights reserved, Open Analytics NV, 2021-2025. 
+All rights reserved, Open Analytics NV, 2021-2025.
 """
 
-from .model import *
+# from .model import *  # Removed: model.py no longer exists (PyTorch dependency removed)
 
 import pandas as pd
 
 import numpy as np
-
-import torch
+from pathlib import Path
 from rdkit import __version__ as rdkit_version
 from rdkit import Chem
 from rdkit.Chem import Descriptors, MolFromSmiles, AllChem
 from rdkit.ML.Descriptors import MoleculeDescriptors
 
-    
+
 from importlib_resources import files
 
 
@@ -33,7 +32,7 @@ def retrieve_default_offline_generators(model='CHEMBL', radius=2, nbits=2048):
         nbits: size of the ecfp features
     """
 
-    return {'Bottleneck':BottleneckTransformer(model='CHEMBL'),
+    return {'Bottleneck':OnnxBottleneckTransformer(),
             'rdkit':RDKITGenerator(),
             f'fps_{nbits}_{radius}':ECFPGenerator(radius=radius, nBits =nbits)
            }
@@ -245,130 +244,6 @@ class ECFPGenerator(FeatureGenerator):
                 return self.nBits*[np.nan]
         return [getFP(s) for s in smiles]
                     
-
-###############################
-class BottleneckTransformer(nn.Module,FeatureGenerator):
-    '''
-    Feature generator returning the features of the bottleneck transformer
-    '''
-    def __init__(self,model='CHEMBL' ,use_gpu=False,batch_size=100,seq_len=220,model_file=None):
-        '''
-        initialization that loads the Bottleneck model
-        
-        Args:
-            model:string indicating use of encoder [ChEMBL]
-            use_gpu: boolean to use gpu
-            batch_size: integer batch size of processed smiles
-            seq_len: max sequence length of the smiles
-            model_file: model file of the encoder [=None], if None internal model files are used based on model param. 
-        '''
-        super(BottleneckTransformer, self).__init__()
-        assert   model in ['CHEMBL'], 'provide valid encoder'
-        ## model file of the encoder
-        self.base_model_file=None
-        if use_gpu and  torch.cuda.is_available():
-            device = torch.device(f'cuda:0')
-        else:
-            device =torch.device('cpu')
-        if model_file is None: 
-            self.base_model_file =  str(files('automol.trained_models').joinpath('bottleneck_CHEMBL27_ENUM_SMILES_ENCODER.pt')) 
-        else:
-            self.base_model_file=model_file
-        print(f'loading the base model from file: {self.base_model_file}')
-        checkpoint = torch.load(self.base_model_file , map_location='cpu',weights_only=False)
-        ## smiles encoder
-        self.Smiles_Encoder= checkpoint['Smiles_Encoder']
-        self.Smiles_Encoder.load_state_dict(checkpoint['Smiles_Encoder_model_state_dict'])
-        ## vocabulary
-        self.vocab= checkpoint['vocab']
-        self.pad_index= self.vocab.pad_index
-        self.Smiles_Encoder.eval()
-        self.Smiles_Encoder=self.Smiles_Encoder.to(device)
-        ## batch size
-        self.batch_size=batch_size
-        ## sequence length
-        self.seq_len=seq_len
-        ## hard coded number of features
-        self.nb_features=250
-        ## list of feature names
-        self.names=[f'Bottleneck_{i}_of_{self.nb_features}_model_{model}' for i in range(self.nb_features)]
-        ## generator name
-        self.generator_name=f'automol_bn_{self.base_model_file}'
-        print('using device:',device)        
-        
-    def makebatch(self,sms, seq_len=220):
-        """
-        function that create a batch that is fed to the encoder
-        
-        Args:
-            sms: list of smiles
-            seq_len: max sequence length of the smiles
-            
-        Returns:
-            torch tensor with the tokenized values
-        """
-        intgs=[]
-        for s in sms:
-            i= self.vocab.smile2int( s, max_smile_len=seq_len, with_eos=True, with_sos=True, return_len=False)
-            intgs.append(torch.tensor(i))
-        out=torch.stack(intgs, dim=0)
-        return out
-                    
-    def generate(self, smiles):
-        '''
-        generates the features
-        
-        Args:
-            smiles: list of smiles
-        
-        Returns:
-            numpy matrix with the generated feature matrix X
-        '''
-        dataframe=False
-        if isinstance(smiles, pd.DataFrame) or isinstance(smiles, pd.Series):
-            dataframe=True
-        last_en_layer=self.Smiles_Encoder.encoder.num_layers-1
-        device=next(self.Smiles_Encoder.parameters()).device
-        self.Smiles_Encoder.eval()
-        outputs=[]
-        st=0
-        end=0
-        while end < (len(smiles)):
-            end= min(st+self.batch_size, len(smiles))
-            if dataframe:
-                src=self.makebatch(smiles.iloc[st:end] ,seq_len=self.seq_len)
-            else:
-                src=self.makebatch(smiles[st:end] ,seq_len=self.seq_len)
-            st+=self.batch_size
-            src = src.to(device)
-            src= torch.t(src)
-            with torch.no_grad():
-                out=self.Smiles_Encoder(src)[f'{last_en_layer}']['output'][0, :]
-                #print('out shape',out.shape)
-            outputs.append(out.detach().cpu().numpy() )
-        outputs = np.concatenate(outputs, axis=0)
-        #test nan 
-        #outputs[-1]=np.array(self.nb_features*(np.nan,))
-        return outputs
-    
-    def __call__(self, smiles,batch_size=100,seq_len=220):
-        """
-        operator() to generate features, call function generate
-        
-        Args:
-            smiles: list of smiles
-            batch_size: batch size
-            seq_len: max sequence length
-        
-        Returns:
-            numpy matrix containing the generated features
-        """
-        self.batch_size=batch_size
-        self.seq_len=seq_len
-        return self.generate( smiles)
-    
-
-
 class MolfeatGenerator(FeatureGenerator):
     def __init__(self):
         super().__init__()
@@ -574,4 +449,217 @@ class MolfeatGraphormerTransformer(MolfeatGenerator):
         self.names.extend(f'feature_{x}' for x in range(self.nb_features))
         self.batch_size=batch_size
 
-    
+
+
+from pathlib import Path
+import os
+from typing import List, Optional, Union
+
+import numpy as np
+
+from .tokenization import Vocabulary, SmilesTokenizer
+
+
+class OnnxBottleneckTransformer(FeatureGenerator):
+    """
+    ONNX Runtime version of BottleneckTransformer.
+
+    Generates 250-dimensional features from SMILES strings using a
+    pre-trained transformer encoder exported to ONNX format.
+
+    No PyTorch required for inference.
+
+    Attributes:
+        n_features: Number of features (250)
+        names: Feature names
+        session: ONNX Runtime inference session
+    """
+
+    def __init__(
+        self,
+        model_path: Optional[str] = None,
+        vocab_path: Optional[str] = None,
+        providers: Optional[List[str]] = None,
+        batch_size: int = 100,
+        seq_len: int = 220,
+    ):
+        """
+        Initialize the ONNX-based bottleneck transformer.
+
+        Args:
+            model_path: Path to ONNX model file. If None, uses default.
+            vocab_path: Path to vocabulary JSON file. If None, uses default.
+            providers: ONNX Runtime execution providers. Default: ['CPUExecutionProvider']
+            batch_size: Batch size for processing (for memory efficiency)
+            seq_len: Maximum sequence length for SMILES
+        """
+        super().__init__()
+
+        try:
+            import onnxruntime as ort
+        except ImportError:
+            raise ImportError(
+                "ONNX Runtime is required for inference. "
+                "Install with: pip install onnxruntime"
+            )
+
+        # Default paths
+        base_dir = os.path.dirname(os.path.realpath(__file__))
+
+        if model_path is None:
+            model_path = base_dir + '/bottleneck_encoder.onnx'
+        if vocab_path is None:
+            vocab_path = base_dir + '/vocab.json'
+
+        self.model_path = model_path
+        self.vocab_path = vocab_path
+        self.batch_size = batch_size
+        self.seq_len = seq_len
+
+        # Initialize tokenizer with vocabulary
+        self.tokenizer = SmilesTokenizer(
+            vocab_path=vocab_path,
+            max_seq_len=seq_len,
+            add_sos=True,
+            add_eos=True,
+        )
+
+        # Create ONNX Runtime session
+        providers = providers or ['CPUExecutionProvider']
+
+        # Check if model file exists
+        if not Path(model_path).exists():
+            raise FileNotFoundError(
+                f"ONNX model not found at {model_path}. "
+                "Run the conversion script first: "
+                "python -m automol_onnx.conversion.export_bottleneck"
+            )
+
+        self.session = ort.InferenceSession(model_path, providers=providers)
+
+        # Get input/output names from model
+        self.input_name = self.session.get_inputs()[0].name
+        self.output_name = self.session.get_outputs()[0].name
+
+        # Feature configuration
+        self.nb_features = 250
+        self.names = [f'Bottleneck_{i}_of_{self.nb_features}_model_CHEMBL' for i in range(self.nb_features)]
+        self.generator_name = f'automol_onnx_bn_{Path(model_path).stem}'
+
+    def _run_inference(self, input_ids: np.ndarray) -> np.ndarray:
+        """
+        Run ONNX inference on tokenized input.
+
+        Args:
+            input_ids: Token array of shape [seq_len, batch_size]
+
+        Returns:
+            Feature array of shape [batch_size, 250]
+        """
+        outputs = self.session.run(
+            [self.output_name],
+            {self.input_name: input_ids}
+        )
+        return outputs[0]
+
+    def generate(self, smiles: Union[List[str], str]) -> np.ndarray:
+        """
+        Generate features for SMILES strings.
+
+        Args:
+            smiles: Single SMILES string or list of SMILES
+
+        Returns:
+            numpy array of shape (n_samples, 250)
+        """
+        # Handle single SMILES
+        if isinstance(smiles, str):
+            smiles = [smiles]
+
+        # Handle pandas Series/DataFrame
+        if hasattr(smiles, 'tolist'):
+            smiles = smiles.tolist()
+
+        # Process in batches for memory efficiency
+        all_features = []
+
+        for start_idx in range(0, len(smiles), self.batch_size):
+            end_idx = min(start_idx + self.batch_size, len(smiles))
+            batch = smiles[start_idx:end_idx]
+
+            # Tokenize batch: [seq_len, batch_size]
+            input_ids = self.tokenizer.tokenize_batch(batch)
+
+            # Run inference: [batch_size, 250]
+            features = self._run_inference(input_ids)
+
+            all_features.append(features)
+
+        # Concatenate all batches
+        return np.vstack(all_features)
+
+    def __call__(
+        self,
+        smiles: Union[List[str], str],
+        batch_size: Optional[int] = None,
+        seq_len: Optional[int] = None,
+    ) -> np.ndarray:
+        """
+        Generate features (callable interface).
+
+        Args:
+            smiles: Single SMILES or list of SMILES
+            batch_size: Override batch size
+            seq_len: Override sequence length (not used, kept for API compatibility)
+
+        Returns:
+            Feature array
+        """
+        if batch_size is not None:
+            self.batch_size = batch_size
+
+        return self.generate(smiles)
+
+    def get_feature_names(self) -> List[str]:
+        """Get list of feature names."""
+        return self.names
+
+    @property
+    def n_features(self) -> int:
+        """Number of features generated."""
+        return self.nb_features
+
+    def __repr__(self) -> str:
+        return (
+            f"OnnxBottleneckTransformer("
+            f"model='{Path(self.model_path).name}', "
+            f"nb_features={self.nb_features})"
+        )
+
+    def __getstate__(self):
+        """
+        Get state for pickling. Exclude the unpicklable ONNX session.
+        """
+        state = self.__dict__.copy()
+        # Remove the unpicklable ONNX session
+        state['session'] = None
+        state['input_name'] = None
+        state['output_name'] = None
+        return state
+
+    def __setstate__(self, state):
+        """
+        Set state when unpickling. Recreate the ONNX session.
+        """
+        self.__dict__.update(state)
+        # Recreate the ONNX session
+        try:
+            import onnxruntime as ort
+        except ImportError:
+            raise ImportError(
+                "ONNX Runtime is required for inference. "
+                "Install with: pip install onnxruntime"
+            )
+        self.session = ort.InferenceSession(self.model_path, providers=['CPUExecutionProvider'])
+        self.input_name = self.session.get_inputs()[0].name
+        self.output_name = self.session.get_outputs()[0].name

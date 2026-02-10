@@ -32,7 +32,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoad
 
 from .stat_plotly_util import *
 from .version import __version__
-from .model import *
+# from .model import *  # Removed: model.py no longer exists (PyTorch dependency removed)
 #from .util import *
 
 ## titles of the figures in the pdf report
