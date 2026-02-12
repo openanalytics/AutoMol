@@ -19,7 +19,7 @@ import os
 from tqdm import tqdm
 from rdkit import Chem
 
-def get_pdbs_cids(data_folder='/domino/datasets/JnJInternal/manuscript_data/',provided_targets=None):
+def get_pdbs_cids(data_folder='/domino/datasets/Internal/manuscript_data/',provided_targets=None):
     
     if provided_targets is None:
         targets=next(os.walk(data_folder))[1]
@@ -156,7 +156,7 @@ class AbsoluteDataModule(L.LightningDataModule):
                 if 'manuscript_data_folder' in self.config:
                     _,given_cids=get_pdbs_cids(data_folder=self.config['manuscript_data_folder'])
                 else:
-                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/JnJInternal/manuscript_data/')
+                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/Internal/manuscript_data/')
             else:
                 given_cids=config['given_cids']
             train_ind,val_ind,test_ind = lk_cid_split(self.config['leakproof'],self.df,given_cids,self.protein_coor,self.protein_ids,filters=self.config['filters'])
@@ -167,7 +167,7 @@ class AbsoluteDataModule(L.LightningDataModule):
                 if 'manuscript_data_folder' in self.config:
                     _,given_cids=get_pdbs_cids(data_folder=self.config['manuscript_data_folder'])
                 else:
-                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/JnJInternal/manuscript_data/')
+                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/Internal/manuscript_data/')
             else:
                 given_cids=config['given_cids']
             temp_ind,test_ind = cid_split(self.df,given_cids,self.protein_coor,self.protein_ids)
@@ -331,7 +331,7 @@ class RelativeDataModule(L.LightningDataModule):
                 if 'manuscript_data_folder' in self.config:
                     _,given_cids=get_pdbs_cids(data_folder=self.config['manuscript_data_folder'])
                 else:
-                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/JnJInternal/manuscript_data/')
+                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/Internal/manuscript_data/')
             else:
                 given_cids=config['given_cids']
             train_ind,val_ind,test_ind = lk_cid_split(self.config['leakproof'],self.df,given_cids,self.protein_coor,self.prot_df['pdb_id'],filters=self.config['filters'])
@@ -342,7 +342,7 @@ class RelativeDataModule(L.LightningDataModule):
                 if 'manuscript_data_folder' in self.config:
                     _,given_cids=get_pdbs_cids(data_folder=self.config['manuscript_data_folder'])
                 else:
-                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/JnJInternal/manuscript_data/')
+                    _,given_cids=get_pdbs_cids(data_folder='/domino/datasets/Internal/manuscript_data/')
             else:
                 given_cids=self.config['given_cids']
             temp_ind,test_ind = cid_split(self.df,given_cids,self.protein_coor,self.prot_df['pdb_id'])

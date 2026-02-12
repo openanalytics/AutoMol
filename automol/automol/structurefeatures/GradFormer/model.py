@@ -7,8 +7,9 @@ import math, copy ,os ,inspect
 from torch_geometric.nn import global_add_pool, GINConv, GINEConv, global_mean_pool, global_max_pool
 from torch_geometric.data import Data
 import pyximport
-pyximport.install(setup_args={'include_dirs': np.get_include()})
-import dataset_utils.algos
+add_path=os.path.realpath(__file__)
+pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path.rsplit('/')[0]]})
+from automol.structurefeatures.GradFormer import algos
 from grad_conv import GPSConv ,  GatedGCNLayer
 from dataset_utils.utils import process_hop
 from dataset_utils.data_util import get_atom_feature_dims, get_bond_feature_dims 
@@ -444,7 +445,7 @@ class Gradformer_DownstreamTasks(torch.nn.Module):
             self.base_model_file=f'{model_dir}/JNJ_3_ENCODER.pt'
             assert os.path.isfile(self.base_model_file),f'provide encoder file {self.base_model_file} not found!'
             print(f'loading the base model from file: {self.base_model_file}')
-            checkpoint = torch.load(self.base_model_file , map_location='cpu')
+            checkpoint = torch.load(self.base_model_file , map_location='cpu', weights_only=False)
             self.encoder=checkpoint['model']
             self.encoder.load_state_dict(checkpoint['model_state_dict'])
         else:
@@ -875,7 +876,7 @@ class hybrid_global_local_DownstreamTasks(torch.nn.Module):
             self.base_model_file=f'{model_dir}/JNJ_3_ENCODER.pt'
             assert os.path.isfile(self.base_model_file),f'provide encoder file {self.base_model_file} not found!'
             print(f'loading the base model from file: {self.base_model_file}')
-            checkpoint = torch.load(self.base_model_file , map_location='cpu')
+            checkpoint = torch.load(self.base_model_file , map_location='cpu', weights_only=False)
             self.encoder=checkpoint['model']
             self.encoder.load_state_dict(checkpoint['model_state_dict'])
         else:

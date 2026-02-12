@@ -42,9 +42,12 @@ class InteractionFeaturesGenerator(FeatureGenerator):
                      properties= ['pIC50'] ,
                      nb_features=132):
         """
-        Initialization 
+        Initialization
         """
-        trainingdata_folder=f'{processed_data_folder}/{name}/'
+        # Ensure processed_data_folder doesn't start with / to avoid absolute path issues
+        if processed_data_folder and not processed_data_folder.endswith('/'):
+            processed_data_folder = processed_data_folder + '/'
+        trainingdata_folder=f'{processed_data_folder}{name}/'
         self.properties=properties
         self._setup_data(pdb_folder,sdf_file,trainingdata_folder,name)
         self._setup_model(config,model_f)
@@ -59,18 +62,18 @@ class InteractionFeaturesGenerator(FeatureGenerator):
     def _setup_model(self,config,model_f):
 
         if config['pure_pharma']:
-            head=MHAAbsolutePharmaRegressionhead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)# 
+            head=MHAAbsolutePharmaRegressionhead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
 
         elif config['ligand_res_enc']:
             if config['simple_head']:
-                head=LinearAbsolutehead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=LinearAbsolutehead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
             else:
-                head=MHAAbsolutehead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=MHAAbsolutehead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
         else:
             if config['simple_head']:
-                head=LinearAbsolutehead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=LinearAbsolutehead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
             else:
-                head=MHAAbsolutehead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=MHAAbsolutehead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
                 
         self.model=head
 
@@ -181,9 +184,12 @@ class InteractionRelativeFeaturesGenerator(FeatureGenerator):
                      properties= ['pIC50'] ,
                      nb_features=132):
         """
-        Initialization 
+        Initialization
         """
-        trainingdata_folder=f'{processed_data_folder}/{name}/'
+        # Ensure processed_data_folder doesn't start with / to avoid absolute path issues
+        if processed_data_folder and not processed_data_folder.endswith('/'):
+            processed_data_folder = processed_data_folder + '/'
+        trainingdata_folder=f'{processed_data_folder}{name}/'
         self.properties=properties
         self._setup_data(pdb_folder,sdf_file,trainingdata_folder,name)
         self._setup_model(config,model_f)
@@ -197,18 +203,18 @@ class InteractionRelativeFeaturesGenerator(FeatureGenerator):
     def _setup_model(self,config,model_f):
         
         if config['pure_pharma']:
-            head=MHARelativePharmaRegressionhead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+            head=MHARelativePharmaRegressionhead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
 
         elif config['ligand_res_enc']:
             if config['simple_head']:
-                head=LinearRelativehead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=LinearRelativehead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
             else:
-                head=MHARelativeDecoderhead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=MHARelativeDecoderhead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
         else:
             if config['simple_head']:
-                head=LinearRelativehead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=LinearRelativehead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
             else:
-                head=MHARelativeDecoderhead.load_from_checkpoint(model_f)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
+                head=MHARelativeDecoderhead.load_from_checkpoint(model_f, weights_only=False)#torch.load(model_f, map_location=torch.device("cpu"), weights_only=True)#
                 
         self.model=head
 

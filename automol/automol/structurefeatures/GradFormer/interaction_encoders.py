@@ -1,11 +1,12 @@
 import torch
 import numpy as np
+import os
 from torch.nn.utils.rnn import pad_sequence
 from torch_geometric.data import Data,Batch
 import pyximport
-pyximport.install(setup_args={'include_dirs': np.get_include()})
-#from add_path import algos
-import algos
+add_path=os.path.realpath(__file__)
+pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path.rsplit('/')[0]]})
+from automol.structurefeatures.GradFormer import algos
 
 
 class InteractionMHAType(torch.nn.Module):

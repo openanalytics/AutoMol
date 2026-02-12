@@ -15,7 +15,12 @@ import math
 import numpy as np
 from torch import nn , Tensor
 from torch.nn import functional as F
-from pkg_resources import resource_filename
+try:
+    from pkg_resources import resource_filename
+except ImportError:
+    from importlib.resources import files
+    def resource_filename(package, resource):
+        return str(files(package) / resource)
 
 #######################################################################
 class transformer_init():

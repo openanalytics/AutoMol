@@ -17,10 +17,8 @@ from torch_geometric.transforms import BaseTransform
 from torch.utils.data import  DataLoader, Dataset
 import pyximport
 add_path=os.path.realpath(__file__)
-#sys.path.append(add_path)
-pyximport.install(setup_args={'include_dirs': np.get_include()})
-#from add_path import algos
-import algos
+pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path.rsplit('/')[0]]})
+from automol.structurefeatures.GradFormer.dataset_utils import algos
 
 
 #from commute import adj_pinv

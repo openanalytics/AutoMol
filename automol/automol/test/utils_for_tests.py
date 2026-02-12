@@ -187,11 +187,11 @@ class test_util:
                                                           verbose=verbose,random_state=random_state,mix_dict=mix_coef_dict, categorical_data=categorical,
                                                            minority_nb=minority_nb,clustering_algorithm=clustering_algorithm, chem_clustering_algorithm=chem_clustering_algorithm)
         elif strategy=='stratified':
-            Train, Validation = stratified_validation(df,class_properties,stacked_model,df_smiles,test_size=test_size,clustering=val_clustering,
+            Train, Validation = stratified_validation(df,class_properties,stacked_model,standard_smiles_column,df_smiles,test_size=test_size,clustering=val_clustering,
                                                           n_clusters=val_km_groups,cutoff=val_butina_cutoff,include_chirality=val_include_chirality,
                                                           verbose=verbose,random_state=random_state, minority_nb=minority_nb,clustering_algorithm=clustering_algorithm)
         else:
-            Train, Validation = leave_grp_out_validation(df,class_properties,stacked_model,df_smiles,test_size=test_size,clustering=val_clustering,
+            Train, Validation = leave_grp_out_validation(df,class_properties,stacked_model,standard_smiles_column,df_smiles,test_size=test_size,clustering=val_clustering,
                                                           n_clusters=val_km_groups,cutoff=val_butina_cutoff,include_chirality=val_include_chirality,
                                                           verbose=verbose,random_state=random_state,clustering_algorithm=clustering_algorithm)
             leave_grp_out=np.arange(len(Validation))

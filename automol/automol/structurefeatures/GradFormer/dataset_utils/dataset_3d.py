@@ -16,9 +16,8 @@ from torch_geometric.transforms import BaseTransform
 #from utils import process_sph
 from torch.utils.data import  Dataset
 import pyximport
-#add_path=os.path.realpath(__file__)
-#sys.path.append(add_path)
-pyximport.install(setup_args={'include_dirs': np.get_include()})
+add_path=os.path.realpath(__file__)
+pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path.rsplit('/')[0]]})
 #from add_path import algos
 from torch_geometric.data import InMemoryDataset
 import os
@@ -325,7 +324,7 @@ def process_pdb(pdb_tuple):
             ############
             if pre_transform: data=pre_transform(data)
 
-            torch.save(data, osp.join(processed_dir, filenm))
+            torch.save(data, filenm)
             return f'{filenm} created'
         except Exception as e:
             print(f'{filenm} failed: {e}')
@@ -389,7 +388,7 @@ class ResidueGranularityDataset(Dataset):
             tuple_list=[ (i,pdbs_list[i],pdbs_files[i],self.properties,[], self.pre_transform, self.processed_dir) for i in range(len(pdbs_list))]
             
         print('Converting mol pdbs into graphs...')
-        
+        os.makedirs(self.processed_dir, exist_ok=True)
         message=[]
         #with Pool(self.n_cores) as p:
         #    res=p.imap_unordered(process_pdb, tuple_list,chunksize=self.chunksize)
@@ -582,6 +581,8 @@ class InteractionDataset_SDFfile():
                      chunksize=100):
         
         self.sdf_file = sdf_file
+        if not pdb_file_folder.endswith('/'):
+            pdb_file_folder+='/'
         self.pdb_file_folder=pdb_file_folder
         self.pdb_key = pdb_key
         self.properties = properties

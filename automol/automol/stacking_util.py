@@ -314,7 +314,7 @@ class ModelAndParams:
     
     def __init__(self,model='stereo_SMILES', task='Regression',computional_load='cheap', labelnames=None,
                  distribution_defaults=False, hyperopt_defaults=None ,use_gpu=False, normalizer=True,
-                 top_normalizer=True, random_state=42, red_dim_list=None, method_list=None,
+                 top_normalizer=True, random_state=[42], red_dim_list=None, method_list=None,
                  blender_list=None, model_config=None, force_gridsearch=False, randomized_iterations=None,
                  method_archive=None, dim_archive=None, blender_archive=None, prefixes=None, verbose=False,
                  hyperopt_threads=None, n_jobs=None, xgb_threads=None, rfr_threads=None,
@@ -415,6 +415,13 @@ class ModelAndParams:
                     if use_sample_weight:
                         method_list=['lr' ,'SVC']
                 if blender_list is None: blender_list=['lr']
+            elif computional_load=='free':
+                if model_config is None: model_config='single_method'
+                if red_dim_list is None: red_dim_list=['passthrough']
+                if method_list is None: 
+                    method_list=['lgbm' ]
+                if blender_list is None: blender_list=['lr']
+                n_iter=100
             elif computional_load=='expensive':
                 if model_config is None: model_config='top_stacking'
                 n_iter=100
@@ -458,6 +465,13 @@ class ModelAndParams:
                     if use_sample_weight:
                         method_list=['svr','lasso','kernelridge' ]
                 if blender_list is None: blender_list=['svr','lasso','kernelridge']
+            elif computional_load=='free':
+                if model_config is None: model_config='single_method'
+                if red_dim_list is None: red_dim_list=['passthrough']
+                if method_list is None: 
+                    method_list=['lgbm' ]
+                if blender_list is None: blender_list=['svr','lasso','kernelridge']
+                n_iter=100
             elif computional_load=='expensive':
                 if model_config is None: model_config='top_stacking'
                 n_iter=100

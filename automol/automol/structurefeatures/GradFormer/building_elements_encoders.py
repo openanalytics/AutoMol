@@ -14,7 +14,8 @@ from torch_geometric.nn import global_add_pool, GINConv, GINEConv, global_mean_p
 from torch_geometric.data import Data
 ######
 import pyximport
-pyximport.install(setup_args={'include_dirs': np.get_include()})
+add_path=os.path.realpath(__file__)
+pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path.rsplit('/')[0]]})
 #from dataset_utils.utils import process_hop
 from automol.structurefeatures.GradFormer.utils_3d.protein_features_util import get_res_feature_dims, get_res_res_bond_feature_dims, get_Noncovalent_bond_feature_dims
 
