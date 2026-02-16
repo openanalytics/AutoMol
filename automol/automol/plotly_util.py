@@ -185,7 +185,6 @@ def generate_report(plotly_dictionary,selected_figures,captions,types,title='Aut
     captions=[capti.replace('\33[1m' ,'<b>').replace('\33[0m' ,'</b>') for capti in captions]
     types=[re.sub(' \(type [A-Z]\)', '', t.replace('\33[1m' ,'<b>').replace('\33[0m' ,'</b>')) for t in types]
     
-    d='/'.join((os.path.abspath(inspect.getfile(MultiheadAttention))).split("/")[:-1])
     import automol.pdf_template as pdf_template_pkg
     template_dir = str(Path(pdf_template_pkg.__file__).parent)
     work_dir=os.getcwd()
