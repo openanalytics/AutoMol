@@ -16,8 +16,8 @@ from torch_geometric.transforms import BaseTransform
 #from utils import process_sph
 from torch.utils.data import  Dataset
 import pyximport
-add_path=os.path.realpath(__file__)
-pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path.rsplit('/')[0]]})
+add_path=os.path.dirname(os.path.realpath(__file__)).replace('\\', '/')
+pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path]})
 #from add_path import algos
 from torch_geometric.data import InMemoryDataset
 import os

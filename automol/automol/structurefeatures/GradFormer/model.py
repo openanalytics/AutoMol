@@ -7,8 +7,8 @@ import math, copy ,os ,inspect
 from torch_geometric.nn import global_add_pool, GINConv, GINEConv, global_mean_pool, global_max_pool
 from torch_geometric.data import Data
 import pyximport
-add_path=os.path.realpath(__file__)
-pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path.rsplit('/')[0]]})
+add_path=os.path.dirname(os.path.realpath(__file__)).replace('\\', '/')
+pyximport.install(setup_args={'include_dirs': [np.get_include(),add_path]})
 from automol.structurefeatures.GradFormer import algos
 from grad_conv import GPSConv ,  GatedGCNLayer
 from dataset_utils.utils import process_hop
