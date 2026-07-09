@@ -269,8 +269,8 @@ def mixed_validation(df_orig,properties,stacked_model=None,standard_smiles_colum
         order=np.random.permutation(range(len(prop_count)))
         lgo_indices=[]
         for i in order:
-            if active_test_size+prop_count[i]<min_test_size*1.1:
-                active_test_size+=prop_count[i]
+            if active_test_size+prop_count.iloc[i]<min_test_size*1.1:
+                active_test_size+=prop_count.iloc[i]
                 #print(test_size,prop_count[i],df.index[df['cluster'] == i].tolist())
                 lgo_indices=lgo_indices+df.index[df['stratify'] == prop_count.index[i]].tolist()
             if active_test_size>min_test_size*0.95:
@@ -370,10 +370,10 @@ def leave_grp_out_validation(df,properties,stacked_model=None,standard_smiles_co
     order=np.random.permutation(range(len(prop_count)))
     validation_indices=[]
     for i in order:
-        if active_test_size+prop_count[i]<min_test_size*1.1:
-            active_test_size+=prop_count[i]
+        if active_test_size+prop_count.iloc[i]<min_test_size*1.1:
+            active_test_size+=prop_count.iloc[i]
             #print(test_size,prop_count[i],df.index[df['cluster'] == i].tolist())
-            validation_indices=validation_indices+df.index[df['cluster'] == i].tolist()
+            validation_indices=validation_indices+df.index[df['cluster'] == prop_count.index[i]].tolist()
         if active_test_size>min_test_size*0.95:
             break
     

@@ -1726,13 +1726,13 @@ class automol_UnitTests(TestCase):
         cmap=['PiYG','Blues']
         out=stacked_model.predict( props =None, smiles=stacked_model.Validation.stereo_SMILES,compute_SD=True,convert_log10=False)
 
-        youden_dict=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
-        F1_dict=ResultDesigner().show_clf_threshold_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,youden_dict=youden_dict)
+        #youden_dict=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
+        #F1_dict=ResultDesigner().show_clf_threshold_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,youden_dict=youden_dict)
         
-        [stacked_model.set_property_threshold(prop=p,class_index=interest_class[ip],threshold=F1_dict[p][interest_class[ip]])for ip,p in enumerate(class_properties)]
-        out=stacked_model.predict( props =None, smiles=stacked_model.Validation[standard_smiles_column],compute_SD=True,convert_log10=False)
+        #[stacked_model.set_property_threshold(prop=p,class_index=interest_class[ip],threshold=F1_dict[p][interest_class[ip]])for ip,p in enumerate(class_properties)]
+        #out=stacked_model.predict( props =None, smiles=stacked_model.Validation[standard_smiles_column],compute_SD=True,convert_log10=False)
 
-        _=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
+        #_=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
         
 
         for p in class_properties:
@@ -1954,13 +1954,13 @@ class automol_UnitTests(TestCase):
         cmap=['PiYG','Blues']
         out=stacked_model.predict( props =None, smiles=stacked_model.Validation.stereo_SMILES,compute_SD=True,convert_log10=False)
 
-        youden_dict=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
-        F1_dict=ResultDesigner().show_clf_threshold_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,youden_dict=youden_dict)
+        #youden_dict=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
+        #F1_dict=ResultDesigner().show_clf_threshold_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,youden_dict=youden_dict)
         
-        [stacked_model.set_property_threshold(prop=p,class_index=interest_class[ip],threshold=F1_dict[p][interest_class[ip]])for ip,p in enumerate(class_properties)]
-        out=stacked_model.predict( props =None, smiles=stacked_model.Validation[standard_smiles_column],compute_SD=True,convert_log10=False)
+        #[stacked_model.set_property_threshold(prop=p,class_index=interest_class[ip],threshold=F1_dict[p][interest_class[ip]])for ip,p in enumerate(class_properties)]
+        #out=stacked_model.predict( props =None, smiles=stacked_model.Validation[standard_smiles_column],compute_SD=True,convert_log10=False)
 
-        _=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
+        #_=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
         
 
         for p in class_properties:
@@ -2182,13 +2182,13 @@ class automol_UnitTests(TestCase):
         cmap=['PiYG','Blues']
         out=stacked_model.predict( props =None, smiles=stacked_model.Validation.stereo_SMILES,compute_SD=True,convert_log10=False)
 
-        youden_dict=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
-        F1_dict=ResultDesigner().show_clf_threshold_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,youden_dict=youden_dict)
+        #youden_dict=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
+        #F1_dict=ResultDesigner().show_clf_threshold_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,youden_dict=youden_dict)
         
-        [stacked_model.set_property_threshold(prop=p,class_index=interest_class[ip],threshold=F1_dict[p][interest_class[ip]])for ip,p in enumerate(class_properties)]
-        out=stacked_model.predict( props =None, smiles=stacked_model.Validation[standard_smiles_column],compute_SD=True,convert_log10=False)
+        #[stacked_model.set_property_threshold(prop=p,class_index=interest_class[ip],threshold=F1_dict[p][interest_class[ip]])for ip,p in enumerate(class_properties)]
+        #out=stacked_model.predict( props =None, smiles=stacked_model.Validation[standard_smiles_column],compute_SD=True,convert_log10=False)
 
-        _=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
+        #_=ResultDesigner().show_classification_report(class_properties,out,[stacked_model.Validation[f'{p}'].values for p in class_properties],labelnames=labelnames,cmap=cmap)
         
 
         for p in class_properties:
@@ -3143,7 +3143,8 @@ class automol_UnitTests(TestCase):
         standard_smiles_column='stereo_SMILES'
         df_smiles=df.stereo_SMILES
 
-
+        
+        print('validation')
         Train,Validation,leave_grp_out,prop_clif_dict= test_obj.create_clf_validation(df,properties,properties,strategy,False,stacked_model,standard_smiles_column,df_smiles,
                                                          test_size,val_clustering,val_km_groups,val_butina_cutoff,val_include_chirality,verbose,random_state)
         stacked_model.Validation=Validation
@@ -3154,7 +3155,7 @@ class automol_UnitTests(TestCase):
             prop_count=df[p].count()
             if cv_clustering=='Bottleneck' and prop_count/km_groups<10:
                 print('Warning: on average less than 10 samples per cluster for property',p,', suggested use is to decrease number of groups')
-
+        print('clustering')
         stacked_model.Data_clustering(method=cv_clustering , n_groups=km_groups,cutoff=butina_cutoff,include_chirality=include_chirality ,random_state=random_state)
 
         if outer_folds>km_groups:
@@ -3165,7 +3166,7 @@ class automol_UnitTests(TestCase):
                 
                 
         
-
+        print('training')
         for p in properties:
             sample_weight=None
             if use_sample_weight:

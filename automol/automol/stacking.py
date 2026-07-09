@@ -1072,7 +1072,7 @@ class FeatureGenerationRegressor(BottleneckFeatureGenerator):
         else:
             allprops=[props]
         if smiles is not None:
-            if isinstance(smiles, (list, tuple, np.ndarray,pd.Series)):
+            if isinstance(smiles, (list, tuple, np.ndarray,pd.Series,pd.api.extensions.ExtensionArray)):
                 #if len(smiles)>0:
                 #    smiles=[smi for smi in smiles if len(smi)>0 ]
                 if len(smiles)<1:

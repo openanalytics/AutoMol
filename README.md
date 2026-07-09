@@ -19,8 +19,8 @@ chmod +x install_automol.sh
 otherwise you can install with
 ```
 pip install uv
-uv venv automol_env --python 3.12
-source automol_env/bin/activate
+uv venv .venv --python 3.12
+source .venv/bin/activate
 uv pip install -r requirements.txt
 uv pip install PyTDC
 uv pip install rdkit==2024.3.5
@@ -29,8 +29,8 @@ uv run --with jupyter jupyter lab
 or 
 ```bash
 pip install uv
-uv venv automol_env --python 3.12
-source automol_env/bin/activate
+uv venv .venv --python 3.12
+source .venv/bin/activate
 uv pip install automol_resources/
 uv pip install automol/
 uv pip install molfeat
@@ -98,15 +98,51 @@ The automol has some structure aware features, such as prolif, see the 3Dregress
 A python script that reads the options from a yaml file is provided in the folder script. 
 
 ```bash
-source automol_env/bin/activate
+source .venv/bin/activate
 cd script/
 uv run run_automol.py --yaml_file automl_reg.yaml
 ```
 
+### Claude Code Skills
+
+AutoMol includes two Claude Code skills for streamlined model training and prediction.
+
+#### Starting Claude Code with the Plugin
+
+```bash
+claude --plugin-dir ./automol-tasks-manager/
+```
+
+#### Training Pipeline (`train-pipeline`)
+
+Plan and execute a complete AutoMol training pipeline with automatic configuration:
+
+```
+> train a model on my_dataset.csv
+```
+
+The skill:
+- Auto-detects SMILES columns, task type, and target properties
+- Recommends features and computational load based on dataset characteristics
+- Creates isolated run folders with full pipeline state
+- Supports resuming interrupted training sessions
+
+#### Prediction (`predict`)
+
+Make predictions using trained models:
+
+```
+> predict on new_molecules.csv using the latest model
+```
+
+The skill auto-discovers models from the registry and handles both individual and merged model formats.
+
+See [automol-tasks-manager/](automol-tasks-manager/) for skill documentation.
+
 ### Streamlit App
 Streamlit app for regression and classification can be found in the folder streamlit_app. Upload your csv file and start modelling. Streamlit currently only supports bokeh version 2.4.3. From the repository directory run:
 ```bash
-source automol_env/bin/activate
+source .venv/bin/activate
 uv pip install streamlit bokeh==2.4.3
 cd streamlit_app/
 uv run streamlit run automol_app.py
@@ -497,7 +533,7 @@ This algorithm can then easily be used when clustering for the cross-validation 
 
 To execute unittests run the following command from the root directory of the repository:
 ```bash
-source automol_env/bin/activate
+source .venv/bin/activate
 cd automol/automol/
 uv run -m unittest discover -cf
 ```

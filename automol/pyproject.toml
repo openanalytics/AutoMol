@@ -40,12 +40,12 @@ requires-python = ">=3.8"
 dependencies = [
     # Core scientific computing
     "numpy>=1.21.0",
-    "pandas==2.2.0", 
+    "pandas", 
     "scikit-learn>=1.0.0",
     "scipy>=1.7.0",
     
     # Chemistry and molecular modeling
-    "rdkit==2024.3.5",
+    "rdkit",
     
     # Machine Learning
     "torch>=2.7.0,<2.8.0",
@@ -75,7 +75,7 @@ dependencies = [
     # Progress tracking
     "py3nvml>=0.2.7",
     "setuptools==80.8.0",
-    
+    "ipython==9.15.0",
     # Resource imports
     "importlib-resources>=6.0.0"
 ]

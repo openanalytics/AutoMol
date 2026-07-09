@@ -29,7 +29,7 @@ info() {
 }
 
 # Default values
-ENV_NAME="${1:-automol_env}"
+ENV_NAME="${1:-.venv}"
 PYTHON_VER="${2:-3.12}"
 
 log "Starting AutoMol independent installation..."
